@@ -1,9 +1,15 @@
 import { useState } from 'react';
 import { Input, Button, Form, Label } from './Form.styled';
+import { useDispatch, useSelector } from 'react-redux';
+import { addContact } from 'redux/contactsSlice';
+import { getContacts } from 'redux/selectors';
 
-export default function ContactsForm({ onSubmit }) {
+export default function ContactsForm() {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
 
   const handleInputChange = event => {
     const { name, value } = event.currentTarget;
@@ -24,7 +30,15 @@ export default function ContactsForm({ onSubmit }) {
 
   const handleSumbit = event => {
     event.preventDefault();
-    onSubmit(name, number);
+    const normalizateName = name.toLocaleLowerCase();
+    const findName = contacts.filter(
+      contact => contact.name.toLocaleLowerCase() === normalizateName
+    );
+    if (findName.length !== 0) {
+      alert(`${name} is already in contacts.`);
+    } else {
+      dispatch(addContact(name, number));
+    }
     reset();
   };
 
